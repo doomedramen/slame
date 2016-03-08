@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"os/exec"
+	"bytes"
 )
 
 var (
@@ -153,19 +154,31 @@ func Run(args []string) {
 		cmd := exec.Command(head, parts...)
 
 
-		out, err := cmd.CombinedOutput()
-
-		if(err != nil){
-			panic(err)
-		}
-		println("running", string(out));
-
-		//stdout, err := cmd.Output()
-
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &stderr
+		err := cmd.Run()
 		if err != nil {
-			println(err.Error())
+			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 			return
 		}
+		fmt.Println("Result: " + out.String())
+
+
+		//out, err := cmd.CombinedOutput()
+		//
+		//if(err != nil){
+		//	panic(err)
+		//}
+		//println("running", string(out));
+		//
+		////stdout, err := cmd.Output()
+		//
+		//if err != nil {
+		//	println(err.Error())
+		//	return
+		//}
 
 		//print(string(stdout))
 
