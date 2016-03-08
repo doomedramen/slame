@@ -10,6 +10,7 @@ import (
 	"strings"
 	"os/exec"
 	"bytes"
+	"strconv"
 )
 
 var (
@@ -133,6 +134,11 @@ func Run(args []string) {
 	partition := GetPartition();
 	username := os.Getenv("USER");
 
+	k, err := strconv.Atoi(memory)
+	if (err) {
+		PrintError(memory, "does not seem to be a valid number");
+	}
+	memory = k;
 
 	if (username == "") {
 		PrintError("we could not detect your username //TODO")
@@ -152,7 +158,6 @@ func Run(args []string) {
 
 		//if err := exec.Command(head, parts...)
 		cmd := exec.Command(head, parts...)
-
 
 		var out bytes.Buffer
 		var stderr bytes.Buffer
