@@ -134,12 +134,6 @@ func Run(args []string) {
 	partition := GetPartition();
 	username := os.Getenv("USER");
 
-	k, err := strconv.Atoi(memory)
-	if (err) {
-		PrintError(memory, "does not seem to be a valid number");
-	}
-	memory = k;
-
 	if (username == "") {
 		PrintError("we could not detect your username //TODO")
 	} else if (memory == "") {
@@ -148,9 +142,15 @@ func Run(args []string) {
 		PrintError("you have not set your partion requirement")
 	} else {
 
+		parsedMem, err := strconv.Atoi(memory)
+		check(err)
+		//if (err != nil) {
+		//	PrintError(memory, "does not seem to be a valid number");
+		//}
+
 		//%x[sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"]
 
-		batch := fmt.Sprintf("sbatch --partition %s --mem=%d -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, memory, username, argString);
+		batch := fmt.Sprintf("sbatch --partition %s --mem=%d -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, parsedMem, username, argString);
 		parts := strings.Fields(batch);
 		head := parts[0];
 		parts = parts[1:len(parts)];
@@ -212,8 +212,8 @@ func PrintSuccess(s ...interface{}) {
 
 func check(e error) {
 	if e != nil {
-		//PrintError(e)
-		//os.Exit(1)
-		panic(e);
+		PrintError(e)
+		os.Exit(1)
+		//panic(e);
 	}
 }
