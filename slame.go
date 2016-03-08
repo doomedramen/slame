@@ -90,12 +90,8 @@ func Get(key string) (string, error) {
 }
 func Put(key string, value string) error {
 	return db.Update(func(tx *bolt.Tx) error {
-		if (err != nil) {
-			return err
-		} else {
-			b := tx.Bucket(bucketName)
-			return b.Put([]byte(key), []byte(value))
-		}
+		b := tx.Bucket(bucketName)
+		return b.Put([]byte(key), []byte(value))
 	})
 }
 
