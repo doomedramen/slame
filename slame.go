@@ -150,7 +150,8 @@ func Run(args []string) {
 		parts = parts[1:len(parts)];
 
 		if err := exec.Command(head, parts...).Run(); err != nil {
-			PrintError(err)
+			panic(err);
+			//PrintError(err)
 		}
 		//fmt.Println("Successfully halved image in size")
 		//
