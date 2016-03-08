@@ -4,8 +4,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/codegangsta/cli"
 	"os"
-	"path"
-	"os/user"
+//"path"
+//	"os/user"
 	"github.com/fatih/color"
 	"fmt"
 	"strings"
@@ -20,16 +20,16 @@ var (
 
 func main() {
 
-	usr, err := user.Current()
-	check(err)
+	//usr, err := user.Current()
+	//check(err)
 
-	pathToMe = usr.HomeDir;
+	//pathToMe = usr.HomeDir;
 
-
-	dbPath := path.Join(pathToMe, ".slame.db");
-	db, err = bolt.Open(dbPath, 0600, nil)
-
+	//dbPath := path.Join(pathToMe, ".slame.db");
+	dbPath := "~/.slame.db"
+	db, err := bolt.Open(dbPath, 0600, nil)
 	check(err);
+
 	defer db.Close()
 
 	InitBucket();
