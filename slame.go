@@ -163,7 +163,7 @@ func Run(args []string) {
 		var stderr bytes.Buffer
 		cmd.Stdout = &out
 		cmd.Stderr = &stderr
-		err := cmd.Run()
+		err = cmd.Run()
 		if err != nil {
 			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 			return
