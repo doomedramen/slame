@@ -144,19 +144,15 @@ func Run(args []string) {
 
 		parsedMem, err := strconv.Atoi(memory)
 		check(err)
-		//if (err != nil) {
-		//	PrintError(memory, "does not seem to be a valid number");
-		//}
+
 
 		//%x[sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"]
 
-		batch := fmt.Sprintf("sbatch --partition %s --mem=%d -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, parsedMem, username, argString);
+		batch := fmt.Sprintf("sbatch --partition %s --mem=%d -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%q\"", partition, parsedMem, username, argString);
 		parts := strings.Fields(batch);
 		head := parts[0];
 		parts = parts[1:len(parts)];
 
-
-		//if err := exec.Command(head, parts...)
 		cmd := exec.Command(head, parts...)
 
 		var out bytes.Buffer
@@ -169,32 +165,6 @@ func Run(args []string) {
 			return
 		}
 		fmt.Println("Result: " + out.String())
-
-
-		//out, err := cmd.CombinedOutput()
-		//
-		//if(err != nil){
-		//	panic(err)
-		//}
-		//println("running", string(out));
-		//
-		////stdout, err := cmd.Output()
-		//
-		//if err != nil {
-		//	println(err.Error())
-		//	return
-		//}
-
-		//print(string(stdout))
-
-		//fmt.Println("Successfully halved image in size")
-		//
-		//out, err := exec.Command(head, parts...).Output()
-		//
-		//if err != nil {
-		//	PrintError(err)
-		//}
-		//PrintSuccess(out)
 	}
 }
 
