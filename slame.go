@@ -20,13 +20,15 @@ func main() {
 
 	pathToMe := os.Getenv("HOME")
 
+	var e error
+
 	dbPath := path.Join(pathToMe, ".slame.db");
-	db, e := bolt.Open(dbPath, 0600, nil)
+	db, e = bolt.Open(dbPath, 0600, nil)
 	check(e);
 
-	defer db.Close()
-
 	InitBucket();
+
+	//defer db.Close()
 
 	app := cli.NewApp()
 	app.Name = "slame"
@@ -100,9 +102,12 @@ func Put(key string, value string) error {
 }
 
 func InitBucket() {
+	println("pre init bucket");
 	err := db.Update(func(tx *bolt.Tx) error {
+		println("opened db");
 		_, err := tx.CreateBucketIfNotExists(bucketName);
 		check(err);
+		//return nil
 		return err
 	})
 	check(err)
