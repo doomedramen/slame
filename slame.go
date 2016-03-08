@@ -143,7 +143,7 @@ func Run(args []string) {
 
 		//%x[sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"]
 
-		batch := fmt.Sprintf("sbatch -p %s --mem=%s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, memory, username, argString);
+		batch := fmt.Sprintf("sbatch -p %s --mem=%s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=%s", partition, memory, username, argString);
 		println("going to run:", batch);
 		parts := strings.Fields(batch);
 		head := parts[0];
