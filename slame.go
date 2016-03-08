@@ -10,7 +10,51 @@ import (
 	"strings"
 	"os/exec"
 	"bytes"
-//"strconv"
+)
+
+const (
+	MartinName = "Martin Page"
+	MartinEmail = "martin.page@tsl.ac.uk"
+
+	ShyamName = "Ghanasyam Rallapalli"
+	ShyamEmail = "ghanasyam.rallapalli@tsl.ac.uk"
+
+	SlameFileName = ".slame.db"
+
+	AppName = "Slame"
+	AppUsage = "A tools to make SLURM less of a nightmare"
+	AppVersion = "0.1.0"
+
+	CommandPartitionName = "partition"
+	CommandPartitionAlias = "p"
+	CommandPartitionUsage = "Get and set the partition to run on"
+
+	CommandMemoryName = "memory"
+	CommandMemoryAlias = "m"
+	CommandMemoryUsage = "Get and set the memory allocation"
+
+	CommandRunName = "run"
+	CommandRunAlias = "r"
+	CommandRunUsage = "Run a command via slurm"
+
+	ParamParitionName = "partition"
+	ParamPartitionValue = "tsl-short"
+	ParamPartitionUsage = "partion to run job on. Overwrites global partition selection"
+
+	ParamMemoryName = "memory"
+	ParamMemoryValue = "1000"
+	ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
+
+	SetPartitionMessage = "Partition set to:"
+	GetPartitionMessage = "Current partition:"
+
+	SetMemoryMessage = "Memory allocation set to:"
+	GetMemoryMessage = "Current memory allocation:"
+
+	Error1 = "We could not detect your username"
+	Error2 = "You have set your memory requirement"
+	Error3 = "You have not set your partion requirement"
+	Error4 = "No arguments received after command"
 )
 
 var (
@@ -24,7 +68,7 @@ func main() {
 
 	var e error
 
-	dbPath := path.Join(pathToMe, ".slame.db");
+	dbPath := path.Join(pathToMe, SlameFileName);
 	db, e = bolt.Open(dbPath, 0600, nil)
 	check(e);
 
@@ -33,59 +77,63 @@ func main() {
 	//defer db.Close()
 
 	app := cli.NewApp()
-	app.Name = "slame"
-	app.Usage = "slurm util"
-	app.Version = "0.1.0"
-	app.Authors = []cli.Author{cli.Author{Name: "Martin Page", Email: "martin.page@tsl.ac.uk"}, cli.Author{Name: "Ghanasyam Rallapalli", Email:"ghanasyam.rallapalli@tsl.ac.uk"}}
+	app.Name = AppName
+	app.Usage = AppUsage
+	app.Version = AppVersion
+	app.Authors = []cli.Author{
+		cli.Author{Name: MartinName, Email: MartinEmail},
+		cli.Author{Name: ShyamName, Email:ShyamEmail},
+	}
 
 	app.Commands = []cli.Command{
 		{
-			Name:      "partition",
-			Aliases:     []string{"p"},
-			Usage:     "get and set the partition to run on",
+			Name:CommandPartitionName,
+			Aliases:[]string{CommandPartitionAlias},
+			Usage: CommandPartitionUsage,
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					SetPartition(c.Args().First())
-					PrintSuccess("Partition set to:", GetPartition())
+					PrintSuccess(SetPartitionMessage, GetPartition())
 				} else {
-					PrintSuccess("Current partition:", GetPartition())
+					PrintSuccess(GetPartitionMessage, GetPartition())
 				}
 			},
 		},
 		{
-			Name:      "memory",
-			Aliases:     []string{"m"},
-			Usage:     "get and set the memory allocation",
+			Name:      CommandMemoryName,
+			Aliases:     []string{CommandMemoryAlias},
+			Usage:     CommandMemoryUsage,
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					SetMemory(c.Args().First())
-					PrintSuccess("Memory allocation set to:", GetMemory())
+					PrintSuccess(SetMemoryMessage, GetMemory())
 				} else {
-					PrintSuccess("Current memory allocation:", GetMemory())
+					PrintSuccess(GetMemoryMessage, GetMemory())
 				}
 			},
 		},
 		{
-			Name:      "run",
-			Aliases:     []string{"r"},
-			Usage:     "run command",
+			Name:      CommandRunName,
+			Aliases:     []string{CommandRunAlias},
+			Usage:     CommandRunUsage,
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name: "partition",
-					Value: "tsl-short",
-					Usage: "partion to run job on. Overwrites global partition selection",
+					Name: ParamParitionName,
+					Value: ParamPartitionValue,
+					Usage: ParamPartitionUsage,
 				},
 				cli.StringFlag{
-					Name: "memory",
-					Value: "1000",
-					Usage: "memory to use for job. Overwrites global memory selection",
+					Name: ParamMemoryName,
+					Value: ParamMemoryValue,
+					Usage: ParamMemoryUsage,
 				},
 			},
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					Run(c.Args());
 				} else {
-
+					PrintError(Error4)
+					cli.ShowAppHelp(c)
 				}
 			},
 		},
@@ -120,21 +168,21 @@ func InitBucket() {
 }
 
 func SetPartition(p string) {
-	err := Put("partition", p);
+	err := Put(CommandPartitionName, p);
 	check(err)
 }
 func GetPartition() string {
-	out, err := Get("partition");
+	out, err := Get(CommandPartitionName);
 	check(err)
 	return out;
 }
 
 func SetMemory(m string) {
-	err := Put("memory", m);
+	err := Put(CommandMemoryName, m);
 	check(err)
 }
 func GetMemory() string {
-	out, err := Get("memory");
+	out, err := Get(CommandMemoryName);
 	check(err)
 	return out;
 }
@@ -148,11 +196,11 @@ func Run(args []string) {
 	username := os.Getenv("USER");
 
 	if (username == "") {
-		PrintError("we could not detect your username //TODO")
+		PrintError(Error1)
 	} else if (memory == "") {
-		PrintError("you have set your memory requirement")
+		PrintError(Error2)
 	} else if (partition == "") {
-		PrintError("you have not set your partion requirement")
+		PrintError(Error3)
 	} else {
 
 		head := "sbatch";
@@ -186,6 +234,5 @@ func check(e error) {
 	if e != nil {
 		PrintError(e)
 		os.Exit(1)
-		//panic(e);
 	}
 }
