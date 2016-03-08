@@ -149,12 +149,17 @@ func Run(args []string) {
 		head := parts[0];
 		parts = parts[1:len(parts)];
 
-		out, err := exec.Command(head, parts...).Output()
-		if err != nil {
+		if err := exec.Command(head, parts...).Run(); err != nil {
 			PrintError(err)
 		}
-		PrintSuccess(out)
-		//wg.Done() // Need to signal to waitgroup that this goroutine is done
+		//fmt.Println("Successfully halved image in size")
+		//
+		//out, err := exec.Command(head, parts...).Output()
+		//
+		//if err != nil {
+		//	PrintError(err)
+		//}
+		//PrintSuccess(out)
 	}
 }
 
