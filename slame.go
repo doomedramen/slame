@@ -36,7 +36,7 @@ func main() {
 	app.Name = "slame"
 	app.Usage = "slurm util"
 	app.Version = "0.1.0"
-	app.Authors = []cli.Author{cli.Author{Name: "Martin Page", Email: "martin.page@tsl.ac.uk"}, cli.Author{Name: "Ghanasyam.Rallapalli", Email:"ghanasyam.rallapalli@tsl.ac.uk"}}
+	app.Authors = []cli.Author{cli.Author{Name: "Martin Page", Email: "martin.page@tsl.ac.uk"}, cli.Author{Name: "Ghanasyam Rallapalli", Email:"ghanasyam.rallapalli@tsl.ac.uk"}}
 
 	app.Commands = []cli.Command{
 		{
