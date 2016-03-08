@@ -144,23 +144,30 @@ func Run(args []string) {
 		//%x[sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"]
 
 		batch := fmt.Sprintf("sbatch -p %s --mem=%s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, memory, username, argString);
-		println("going to run:", batch);
 		parts := strings.Fields(batch);
 		head := parts[0];
 		parts = parts[1:len(parts)];
 
-		println(head, parts[0], parts[1], parts[2], parts[3],parts[4],parts[5],parts[6],parts[7],parts[8])
 
 		//if err := exec.Command(head, parts...)
 		cmd := exec.Command(head, parts...)
-		stdout, err := cmd.Output()
+
+
+		out, err := cmd.CombinedOutput()
+
+		if(err != nil){
+			panic(err)
+		}
+		println("running", string(out));
+
+		//stdout, err := cmd.Output()
 
 		if err != nil {
 			println(err.Error())
 			return
 		}
 
-		print(string(stdout))
+		//print(string(stdout))
 
 		//fmt.Println("Successfully halved image in size")
 		//
