@@ -10,7 +10,7 @@ import (
 	"strings"
 	"os/exec"
 	"bytes"
-	"strconv"
+	//"strconv"
 )
 
 var (
@@ -142,20 +142,20 @@ func Run(args []string) {
 		PrintError("you have not set your partion requirement")
 	} else {
 
-		parsedMem, err := strconv.Atoi(memory)
-		check(err)
+		//parsedMem, err := strconv.Atoi(memory)
+		//check(err)
 
 		//%x[sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"]
 
 		//batch := fmt.Sprintf("sbatch -vvv -p %s --mem=%d -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=%q", partition, parsedMem, username, argString);
 		head := "sbatch";
-		cmd := exec.Command(head, "-vvv", "-p", partition, "--mem=", parsedMem, "-n", 1, "--mail-type=END,FAIL", "--mail-user=", username + "@nbi.ac.uk", "--wrap", argString)
+		cmd := exec.Command(head, "-vvv", "-p", partition, "--mem=", memory, "-n", "1", "--mail-type=END,FAIL", "--mail-user=", username + "@nbi.ac.uk", "--wrap", argString)
 		fmt.Println("args", cmd.Args)
 		var out bytes.Buffer
 		var stderr bytes.Buffer
 		cmd.Stdout = &out
 		cmd.Stderr = &stderr
-		err = cmd.Run()
+		err := cmd.Run()
 		if err != nil {
 			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 			return
