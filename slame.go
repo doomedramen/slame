@@ -176,7 +176,8 @@ func PrintSuccess(s ...interface{}) {
 
 func check(e error) {
 	if e != nil {
-		PrintError(e)
-		//panic(e);
+		//PrintError(e)
+		//os.Exit(1)
+		panic(e);
 	}
 }
