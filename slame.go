@@ -36,16 +36,17 @@ func main() {
 	app.Name = "slame"
 	app.Usage = "slurm util"
 	app.Version = "0.1.0"
+	app.Authors = []cli.Author{cli.Author{Name: "Martin Page", Email: "martin.page@tsl.ac.uk"}, cli.Author{Name: "Ghanasyam.Rallapalli", Email:"ghanasyam.rallapalli@tsl.ac.uk"}}
 
 	app.Commands = []cli.Command{
 		{
 			Name:      "partition",
 			Aliases:     []string{"p"},
-			Usage:     "set/get partition",
+			Usage:     "get and set the partition to run on",
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					SetPartition(c.Args().First())
-					PrintSuccess("partition set to:", GetPartition())
+					PrintSuccess("Partition set to:", GetPartition())
 				} else {
 					PrintSuccess("Current partition:", GetPartition())
 				}
@@ -54,7 +55,7 @@ func main() {
 		{
 			Name:      "memory",
 			Aliases:     []string{"m"},
-			Usage:     "set/get memory allocation in mb",
+			Usage:     "get and set the memory allocation",
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					SetMemory(c.Args().First())
@@ -66,8 +67,20 @@ func main() {
 		},
 		{
 			Name:      "run",
-			Aliases:     []string{"m"},
+			Aliases:     []string{"r"},
 			Usage:     "run command",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "partition",
+					Value: "tsl-short",
+					Usage: "partion to run job on. Overwrites global partition selection",
+				},
+				cli.StringFlag{
+					Name: "memory",
+					Value: "1000",
+					Usage: "memory to use for job. Overwrites global memory selection",
+				},
+			},
 			Action: func(c *cli.Context) {
 				if (len(c.Args()) > 0) {
 					Run(c.Args());
