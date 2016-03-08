@@ -149,10 +149,17 @@ func Run(args []string) {
 		head := parts[0];
 		parts = parts[1:len(parts)];
 
-		if err := exec.Command(head, parts...).Run(); err != nil {
-			panic(err);
-			//PrintError(err)
+		//if err := exec.Command(head, parts...)
+		cmd := exec.Command(head, parts...)
+		stdout, err := cmd.Output()
+
+		if err != nil {
+			println(err.Error())
+			return
 		}
+
+		print(string(stdout))
+
 		//fmt.Println("Successfully halved image in size")
 		//
 		//out, err := exec.Command(head, parts...).Output()
