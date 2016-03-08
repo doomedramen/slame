@@ -67,7 +67,6 @@ func main() {
 			Aliases:     []string{"m"},
 			Usage:     "run command",
 			Action: func(c *cli.Context) {
-				println("RUN!!!");
 				if (len(c.Args()) > 0) {
 					Run(c.Args());
 				} else {
@@ -91,7 +90,6 @@ func Get(key string) (string, error) {
 }
 func Put(key string, value string) error {
 	return db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(bucketName);
 		if (err != nil) {
 			return err
 		} else {
@@ -102,12 +100,9 @@ func Put(key string, value string) error {
 }
 
 func InitBucket() {
-	println("pre init bucket");
 	err := db.Update(func(tx *bolt.Tx) error {
-		println("opened db");
 		_, err := tx.CreateBucketIfNotExists(bucketName);
 		check(err);
-		//return nil
 		return err
 	})
 	check(err)
@@ -137,8 +132,6 @@ func Run(args []string) {
 
 	argString := strings.Join(args, " ")
 
-	println("RUN COMMAND:", argString)
-
 	memory := GetMemory();
 	partition := GetPartition();
 	username := os.Getenv("USER");
@@ -153,16 +146,16 @@ func Run(args []string) {
 	} else {
 
 		batch := fmt.Sprintf("sbatch %s %s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=\"%s\"", partition, memory, username, argString);
-		println("want to run", batch);
+		println("going to run:", batch);
 		parts := strings.Fields(batch);
 		head := parts[0];
 		parts = parts[1:len(parts)];
 
 		out, err := exec.Command(head, parts...).Output()
 		if err != nil {
-			fmt.Printf("%s", err)
+			PrintError(err)
 		}
-		fmt.Printf("%s", out)
+		PrintSuccess(out)
 		//wg.Done() // Need to signal to waitgroup that this goroutine is done
 	}
 }
