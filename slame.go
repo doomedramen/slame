@@ -5,7 +5,6 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"path"
-	"os/user"
 	"github.com/fatih/color"
 	"fmt"
 	"strings"
@@ -13,22 +12,18 @@ import (
 )
 
 var (
-	pathToMe string
 	db *bolt.DB
 	bucketName = []byte("slame")
 )
 
 func main() {
 
-	usr, err := user.Current()
-	check(err)
-
-	pathToMe = usr.HomeDir;
+	pathToMe := os.Getenv("HOME")
 
 	dbPath := path.Join(pathToMe, ".slame.db");
-	db, err = bolt.Open(dbPath, 0600, nil)
+	db, e := bolt.Open(dbPath, 0600, nil)
+	check(e);
 
-	check(err);
 	defer db.Close()
 
 	InitBucket();
@@ -83,49 +78,54 @@ func main() {
 	app.Run(os.Args)
 }
 
+func Get(key string) (string, error) {
+	var p []byte;
+	err := db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		p = b.Get([]byte(key))
+		return nil
+	})
+	return string(p), err;
+}
+func Put(key string, value string) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists(bucketName);
+		if (err != nil) {
+			return err
+		} else {
+			b := tx.Bucket(bucketName)
+			return b.Put([]byte(key), []byte(value))
+		}
+	})
+}
+
 func InitBucket() {
-	db.Update(func(tx *bolt.Tx) error {
+	err := db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(bucketName);
 		check(err);
 		return err
 	})
+	check(err)
 }
 
 func SetPartition(p string) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		return b.Put([]byte("partition"), []byte(p))
-	})
-	check(err);
+	err := Put("partition", p);
+	check(err)
 }
 func GetPartition() string {
-	var p []byte;
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		p = b.Get([]byte("partition"))
-		return nil
-	})
+	out, err := Get("partition");
 	check(err)
-	return string(p);
+	return out;
 }
 
 func SetMemory(m string) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		b.Put([]byte("memory"), []byte(m))
-		return nil
-	})
-	check(err);
+	err := Put("memory", m);
+	check(err)
 }
 func GetMemory() string {
-	var m []byte;
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		m = b.Get([]byte("memory"))
-		return nil
-	})
-	check(err);
-	return string(m);
+	out, err := Get("memory");
+	check(err)
+	return out;
 }
 
 func Run(args []string) {
