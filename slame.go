@@ -150,14 +150,10 @@ func main() {
 }
 
 func MemoryConv(amount string) (string, error) {
-
 	_, err := strconv.Atoi(amount);
-
 	if (err == nil) {
-		//its a number, can just return the original string :)
 		return amount, nil
 	} else {
-
 		amountLC := strings.ToLower(amount)
 
 		if (strings.HasSuffix(amountLC, MB)) {
@@ -183,7 +179,6 @@ func MemoryConv(amount string) (string, error) {
 			return "", errors.New(Error5)
 		}
 	}
-
 }
 
 func Get(key string) (string, error) {
