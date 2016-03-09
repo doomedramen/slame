@@ -10,6 +10,8 @@ import (
 	"strings"
 	"os/exec"
 	"bytes"
+	"strconv"
+	"errors"
 )
 
 const (
@@ -51,10 +53,15 @@ const (
 	SetMemoryMessage = "Memory allocation set to:"
 	GetMemoryMessage = "Current memory allocation:"
 
+	MB = "mb"
+	GB = "gb"
+	TB = "tb"
+
 	Error1 = "We could not detect your username"
 	Error2 = "You have set your memory requirement"
 	Error3 = "You have not set your partion requirement"
 	Error4 = "No arguments received after command"
+	Error5 = "Count not parse the value given"
 )
 
 var (
@@ -142,6 +149,43 @@ func main() {
 	app.Run(os.Args)
 }
 
+func MemoryConv(amount string) (string, error) {
+
+	_, err := strconv.Atoi(amount);
+
+	if (err == nil) {
+		//its a number, can just return the original string :)
+		return amount, nil
+	} else {
+
+		amountLC := strings.ToLower(amount)
+
+		if (strings.HasSuffix(amountLC, MB)) {
+			withoutSuffix := strings.Split(amountLC, MB)[0]
+			number, err := strconv.Atoi(withoutSuffix);
+			check(err);
+			inMB := number
+			return strconv.Itoa(inMB), nil
+
+		} else if (strings.HasSuffix(amountLC, GB)) {
+			withoutSuffix := strings.Split(amountLC, GB)[0]
+			number, err := strconv.Atoi(withoutSuffix);
+			check(err);
+			inMB := number * 1024
+			return strconv.Itoa(inMB), nil
+		} else if (strings.HasSuffix(amountLC, TB)) {
+			withoutSuffix := strings.Split(amountLC, TB)[0]
+			number, err := strconv.Atoi(withoutSuffix);
+			check(err);
+			inMB := number * 1024 * 1024
+			return strconv.Itoa(inMB), nil
+		} else {
+			return "", errors.New(Error5)
+		}
+	}
+
+}
+
 func Get(key string) (string, error) {
 	var p []byte;
 	err := db.View(func(tx *bolt.Tx) error {
@@ -178,7 +222,9 @@ func GetPartition() string {
 }
 
 func SetMemory(m string) {
-	err := Put(CommandMemoryName, m);
+	mb, err := MemoryConv(m)
+	check(err)
+	err = Put(CommandMemoryName, mb);
 	check(err)
 }
 func GetMemory() string {
