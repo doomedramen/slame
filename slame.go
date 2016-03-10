@@ -244,8 +244,8 @@ func Run(args []string) {
 		PrintError(Error3)
 	} else {
 
-		head := "sbatch";
-		cmd := exec.Command(head, "-vvv", "-p", partition, "--mem=" + memory, "-n", "1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", "--wrap=\"" + argString + "\"")
+		cmd := SBatch(partition, memory, username, argString);
+
 		var out bytes.Buffer
 		var stderr bytes.Buffer
 		cmd.Stdout = &out
@@ -257,6 +257,13 @@ func Run(args []string) {
 		}
 		fmt.Println(out.String())
 	}
+}
+
+func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
+	sbatch := "sbatch";
+	ug := "-vvv -p " + partition + " --mem=" + memory + " -n 1 --mail-type=END,FAIL --mail-user=" + username + "@nbi.ac.uk --wrap=\"" + argString + "\""
+	strings.Split(ug, " ")
+	return exec.Command(sbatch, ug)
 }
 
 func PrintError(s ...interface{}) {
