@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"strconv"
 	"errors"
+	"syscall"
 )
 
 const (
@@ -264,16 +265,33 @@ func Run(args []string) {
 }
 
 func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
-	sbatch := "sbatch";
-
+	//sbatch := "sbatch";
 	a := fmt.Sprintf("--wrap=%q", argString)
 
-	p := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", a}
+
+	args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", a}
 
 	//split := strings.Split(ug, " ")
-	PrintSuccess("going to run", "sbatch", "with args", p)
+	//PrintSuccess("going to run", "sbatch", "with args", p)
 	//return exec.Command(sbatch, split...)
-	return exec.Command(sbatch, p...)
+
+
+	//"sbatch %s %s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=%q"
+
+	//args := []string{"ls", "-a", "-l", "-h"}
+	env := os.Environ()
+
+	binary, lookErr := exec.LookPath("sbatch")
+	if lookErr != nil {
+		panic(lookErr)
+	}
+
+	execErr := syscall.Exec(binary, args, env)
+	if execErr != nil {
+		panic(execErr)
+	}
+
+	return exec.Command("", "")
 }
 
 func PrintError(s ...interface{}) {
