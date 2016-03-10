@@ -49,6 +49,9 @@ const (
 	ParamMemoryValue = "1000"
 	ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
 
+	ParamVerboseName = "verbose, v"
+	ParamVerboseUsage = "Print verbose output from sbatch"
+
 	SetPartitionMessage = "Partition set to:"
 	GetPartitionMessage = "Current partition:"
 
@@ -101,7 +104,7 @@ func main() {
 			Aliases:[]string{CommandPartitionAlias},
 			Usage: CommandPartitionUsage,
 			Action: func(c *cli.Context) {
-				if (len(c.Args()) > 0) {
+				if (c.NumFlags() > 0) {
 					SetPartition(c.Args().First())
 					PrintSuccess(SetPartitionMessage, GetPartition())
 				} else {
@@ -114,7 +117,7 @@ func main() {
 			Aliases:     []string{CommandMemoryAlias},
 			Usage:     CommandMemoryUsage,
 			Action: func(c *cli.Context) {
-				if (len(c.Args()) > 0) {
+				if (c.NumFlags() > 0) {
 					SetMemory(c.Args().First())
 					PrintSuccess(SetMemoryMessage, GetMemory())
 				} else {
@@ -137,11 +140,18 @@ func main() {
 					Value: ParamMemoryValue,
 					Usage: ParamMemoryUsage,
 				},
+				cli.BoolFlag{
+					Name: ParamVerboseName,
+					Usage:ParamVerboseUsage,
+				},
 			},
 			Action: func(c *cli.Context) {
-				if (len(c.Args()) == 1) {
-					Run(c.Args());
-				} else if (len(c.Args()) > 1) {
+
+				println("flags", );
+
+				if (c.NumFlags() == 1) {
+					Run(c.Args(), c.Bool(ParamVerboseName));
+				} else if (c.NumFlags() > 1) {
 					PrintError(Error6)
 					cli.ShowAppHelp(c)
 				} else {
@@ -234,7 +244,7 @@ func GetMemory() string {
 	return out;
 }
 
-func Run(args []string) {
+func Run(args []string, verbose bool) {
 
 	argString := strings.Join(args, " ")
 
@@ -250,7 +260,13 @@ func Run(args []string) {
 		PrintError(Error3)
 	} else {
 
-		cmd := SBatch(partition, memory, username, argString);
+		verboseString := ""
+
+		if (verbose) {
+			verboseString = "-vvv"
+		}
+
+		cmd := SBatch(verboseString, partition, memory, username, argString);
 
 		var out bytes.Buffer
 		var stderr bytes.Buffer
@@ -270,10 +286,10 @@ func Run(args []string) {
 	}
 }
 
-func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
+func SBatch(verboseString string, partition string, memory string, username string, argString string) *exec.Cmd {
 	sbatch := "sbatch";
 	//sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"
-	args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf("--wrap=\"%q\"", argString)}
+	args := []string{verboseString, "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf("--wrap=\"%q\"", argString)}
 	println("running:", sbatch, args)
 	return exec.Command(sbatch, args...)
 }
