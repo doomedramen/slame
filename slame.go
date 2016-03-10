@@ -41,16 +41,16 @@ const (
 	CommandRunAlias = "r"
 	CommandRunUsage = "Run a command via slurm"
 
-	ParamParitionName = "partition"
-	ParamPartitionValue = "tsl-short"
-	ParamPartitionUsage = "partion to run job on. Overwrites global partition selection"
-
-	ParamMemoryName = "memory"
-	ParamMemoryValue = "1000"
-	ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
-
-	ParamVerboseName = "verbose, v"
-	ParamVerboseUsage = "Print verbose output from sbatch"
+	//ParamParitionName = "partition"
+	//ParamPartitionValue = "tsl-short"
+	//ParamPartitionUsage = "partion to run job on. Overwrites global partition selection"
+	//
+	//ParamMemoryName = "memory"
+	//ParamMemoryValue = "1000"
+	//ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
+	//
+	//ParamVerboseName = "verbose, v"
+	//ParamVerboseUsage = "Print verbose output from sbatch"
 
 	SetPartitionMessage = "Partition set to:"
 	GetPartitionMessage = "Current partition:"
@@ -129,28 +129,28 @@ func main() {
 			Name:      CommandRunName,
 			Aliases:     []string{CommandRunAlias},
 			Usage:     CommandRunUsage,
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name: ParamParitionName,
-					Value: ParamPartitionValue,
-					Usage: ParamPartitionUsage,
-				},
-				cli.StringFlag{
-					Name: ParamMemoryName,
-					Value: ParamMemoryValue,
-					Usage: ParamMemoryUsage,
-				},
-				cli.BoolFlag{
-					Name: ParamVerboseName,
-					Usage:ParamVerboseUsage,
-				},
-			},
+			//Flags: []cli.Flag{
+			//	cli.StringFlag{
+			//		Name: ParamParitionName,
+			//		Value: ParamPartitionValue,
+			//		Usage: ParamPartitionUsage,
+			//	},
+			//	cli.StringFlag{
+			//		Name: ParamMemoryName,
+			//		Value: ParamMemoryValue,
+			//		Usage: ParamMemoryUsage,
+			//	},
+			//	cli.BoolFlag{
+			//		Name: ParamVerboseName,
+			//		Usage:ParamVerboseUsage,
+			//	},
+			//},
 			Action: func(c *cli.Context) {
 
 				println("flags", );
 
 				if (c.NumFlags() == 1) {
-					Run(c.Args(), c.Bool(ParamVerboseName));
+					Run(c.Args());
 				} else if (c.NumFlags() > 1) {
 					PrintError(Error6)
 					cli.ShowAppHelp(c)
@@ -244,7 +244,7 @@ func GetMemory() string {
 	return out;
 }
 
-func Run(args []string, verbose bool) {
+func Run(args []string) {
 
 	argString := strings.Join(args, " ")
 
@@ -260,13 +260,7 @@ func Run(args []string, verbose bool) {
 		PrintError(Error3)
 	} else {
 
-		verboseString := ""
-
-		if (verbose) {
-			verboseString = "-vvv"
-		}
-
-		cmd := SBatch(verboseString, partition, memory, username, argString);
+		cmd := SBatch(partition, memory, username, argString);
 
 		var out bytes.Buffer
 		var stderr bytes.Buffer
@@ -286,10 +280,10 @@ func Run(args []string, verbose bool) {
 	}
 }
 
-func SBatch(verboseString string, partition string, memory string, username string, argString string) *exec.Cmd {
+func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
 	sbatch := "sbatch";
 	//sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"
-	args := []string{verboseString, "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf("--wrap=\"%q\"", argString)}
+	args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf("--wrap=\"%q\"", argString)}
 	println("running:", sbatch, args)
 	return exec.Command(sbatch, args...)
 }
