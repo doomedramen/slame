@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"os/exec"
-	"bytes"
+	//"bytes"
 	"strconv"
 	"errors"
 //"syscall"
@@ -251,28 +251,27 @@ func Run(args []string) {
 
 		cmd := SBatch(partition, memory, username, argString);
 
-		var out bytes.Buffer
-		var stderr bytes.Buffer
-		cmd.Stdout = &out
-		cmd.Stderr = &stderr
+		//var out bytes.Buffer
+		//var stderr bytes.Buffer
+		//cmd.Stdout = &out
+		//cmd.Stderr = &stderr
 		err := cmd.Run()
-		if err != nil {
-			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-			return
-		}
-		fmt.Println(out.String())
+
+		check(err)
+		//if err != nil {
+		//	fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		//	return
+		//}
+		//fmt.Println(out.String())
 	}
 }
 
 func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
 	sbatch := "sbatch";
 	//sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"
-	args := fmt.Sprintf("-p %s --mem=%s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=%q", partition, memory, username, argString)
-
+	args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf("--wrap=%q", argString)}
 	println("running:", sbatch, args)
-
-	//args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf()}
-	return exec.Command(sbatch, args)
+	return exec.Command(sbatch, args...)
 }
 
 func PrintError(s ...interface{}) {
