@@ -12,7 +12,7 @@ import (
 	"bytes"
 	"strconv"
 	"errors"
-	//"syscall"
+//"syscall"
 )
 
 const (
@@ -268,6 +268,9 @@ func SBatch(partition string, memory string, username string, argString string) 
 	sbatch := "sbatch";
 	//sbatch #{partition} #{memory} -n 1 --mail-type=END,FAIL --mail-user=${USER}@nbi.ac.uk --wrap="#{cmd}"
 	args := fmt.Sprintf("-p %s --mem=%s -n 1 --mail-type=END,FAIL --mail-user=%s@nbi.ac.uk --wrap=%q", partition, memory, username, argString)
+
+	println("running:", sbatch, args)
+
 	//args := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", fmt.Sprintf()}
 	return exec.Command(sbatch, args)
 }
