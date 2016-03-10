@@ -265,9 +265,10 @@ func Run(args []string) {
 
 func SBatch(partition string, memory string, username string, argString string) *exec.Cmd {
 	sbatch := "sbatch";
-	//ug := "-vvv -p " + partition + " --mem=" + memory + " -n 1 --mail-type=END,FAIL --mail-user=" + username + "@nbi.ac.uk --wrap=\"" + argString + "\""
 
-	p := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", "--wrap=\"" + argString + "\""}
+	a := fmt.Sprintf("--wrap=%q", argString)
+
+	p := []string{"-vvv", "-p", partition, "--mem=" + memory, "-n 1", "--mail-type=END,FAIL", "--mail-user=" + username + "@nbi.ac.uk", a}
 
 	//split := strings.Split(ug, " ")
 	PrintSuccess("going to run", "sbatch", "with args", p)
