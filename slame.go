@@ -41,16 +41,16 @@ const (
 	CommandRunAlias = "r"
 	CommandRunUsage = "Run a command via slurm"
 
-	//ParamParitionName = "partition"
-	//ParamPartitionValue = "tsl-short"
-	//ParamPartitionUsage = "partion to run job on. Overwrites global partition selection"
-	//
-	//ParamMemoryName = "memory"
-	//ParamMemoryValue = "1000"
-	//ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
-	//
-	//ParamVerboseName = "verbose, v"
-	//ParamVerboseUsage = "Print verbose output from sbatch"
+//ParamParitionName = "partition"
+//ParamPartitionValue = "tsl-short"
+//ParamPartitionUsage = "partion to run job on. Overwrites global partition selection"
+//
+//ParamMemoryName = "memory"
+//ParamMemoryValue = "1000"
+//ParamMemoryUsage = "Memory to use for job. Overwrites global memory selection"
+//
+//ParamVerboseName = "verbose, v"
+//ParamVerboseUsage = "Print verbose output from sbatch"
 
 	SetPartitionMessage = "Partition set to:"
 	GetPartitionMessage = "Current partition:"
@@ -104,7 +104,7 @@ func main() {
 			Aliases:[]string{CommandPartitionAlias},
 			Usage: CommandPartitionUsage,
 			Action: func(c *cli.Context) {
-				if (c.NumFlags() > 0) {
+				if (len(c.Args()) > 0) {
 					SetPartition(c.Args().First())
 					PrintSuccess(SetPartitionMessage, GetPartition())
 				} else {
@@ -117,7 +117,7 @@ func main() {
 			Aliases:     []string{CommandMemoryAlias},
 			Usage:     CommandMemoryUsage,
 			Action: func(c *cli.Context) {
-				if (c.NumFlags() > 0) {
+				if (len(c.Args()) > 0) {
 					SetMemory(c.Args().First())
 					PrintSuccess(SetMemoryMessage, GetMemory())
 				} else {
@@ -149,9 +149,9 @@ func main() {
 
 				println("flags", );
 
-				if (c.NumFlags() == 1) {
+				if (len(c.Args()) == 1) {
 					Run(c.Args());
-				} else if (c.NumFlags() > 1) {
+				} else if (len(c.Args()) > 1) {
 					PrintError(Error6)
 					cli.ShowAppHelp(c)
 				} else {
