@@ -9,10 +9,11 @@ import (
 	"fmt"
 	"strings"
 	"os/exec"
-	//"bytes"
+//"bytes"
 	"strconv"
 	"errors"
 //"syscall"
+	"bytes"
 )
 
 const (
@@ -251,18 +252,21 @@ func Run(args []string) {
 
 		cmd := SBatch(partition, memory, username, argString);
 
-		//var out bytes.Buffer
-		//var stderr bytes.Buffer
-		//cmd.Stdout = &out
-		//cmd.Stderr = &stderr
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 
-		check(err)
+		//check(err)
 		//if err != nil {
 		//	fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		//	return
 		//}
-		//fmt.Println(out.String())
+		fmt.Println("error:", stderr.String())
+		fmt.Println("out:", out.String())
+
+		check(err);
 	}
 }
 
