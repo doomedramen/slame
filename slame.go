@@ -62,6 +62,7 @@ const (
 	Error3 = "You have not set your partion requirement"
 	Error4 = "No arguments received after command"
 	Error5 = "Count not parse the value given"
+	Error6 = "Please put your command in quotes (\"ls -al\")"
 )
 
 var (
@@ -136,8 +137,11 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) {
-				if (len(c.Args()) > 0) {
+				if (len(c.Args()) == 1) {
 					Run(c.Args());
+				} else if (len(c.Args()) > 1) {
+					PrintError(Error6)
+					cli.ShowAppHelp(c)
 				} else {
 					PrintError(Error4)
 					cli.ShowAppHelp(c)
@@ -263,8 +267,9 @@ func SBatch(partition string, memory string, username string, argString string) 
 	sbatch := "sbatch";
 	ug := "-vvv -p " + partition + " --mem=" + memory + " -n 1 --mail-type=END,FAIL --mail-user=" + username + "@nbi.ac.uk --wrap=\"" + argString + "\""
 
-	PrintSuccess("going to run", "sbatch", ug)
+
 	split := strings.Split(ug, " ")
+	PrintSuccess("going to run", "sbatch","with args", split)
 	return exec.Command(sbatch, split...)
 }
 
